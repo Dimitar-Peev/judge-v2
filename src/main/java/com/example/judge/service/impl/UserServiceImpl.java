@@ -1,0 +1,54 @@
+package com.example.judge.service.impl;
+
+import com.example.judge.model.entity.RoleName;
+import com.example.judge.model.entity.User;
+import com.example.judge.model.service.UserServiceModel;
+import com.example.judge.repository.UserRepository;
+import com.example.judge.service.RoleService;
+import com.example.judge.service.UserService;
+import jakarta.servlet.http.HttpSession;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import java.util.Optional;
+
+@AllArgsConstructor
+@Slf4j
+@Service
+public class UserServiceImpl implements UserService {
+
+    private final UserRepository userRepository;
+    private final ModelMapper modelMapper;
+    private final PasswordEncoder passwordEncoder;
+    private final RoleService roleService;
+    private final HttpSession httpSession;
+
+    @Override
+    public boolean register(UserServiceModel userServiceModel) {
+
+        Optional<User> existingUser =
+                this.userRepository.findByUsernameOrEmail(userServiceModel.getUsername(), userServiceModel.getEmail());
+
+        if (existingUser.isPresent()) {
+            log.warn("Failed to create user account. User already exists.");
+            return false;
+        } else {
+            User user = this.modelMapper.map(userServiceModel, User.class);
+            user.setPassword(this.passwordEncoder.encode(userServiceModel.getPassword()));
+
+            if (this.userRepository.count() == 0) {
+                user.setRole(this.roleService.findRole(RoleName.ADMIN));
+            } else {
+                user.setRole(this.roleService.findRole(RoleName.USER));
+            }
+
+            this.userRepository.save(user);
+            log.info("Successfully created new user account for username [%s] and id [%s]".formatted(user.getUsername(), user.getId()));
+            return true;
+        }
+    }
+
+}
