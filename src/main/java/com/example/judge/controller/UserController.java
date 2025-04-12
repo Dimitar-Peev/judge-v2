@@ -1,5 +1,6 @@
 package com.example.judge.controller;
 
+import com.example.judge.model.binding.UserLoginBindingModel;
 import com.example.judge.model.binding.UserRegisterBindingModel;
 import com.example.judge.model.service.UserServiceModel;
 import com.example.judge.service.UserService;
@@ -56,9 +57,44 @@ public class UserController {
         return "redirect:login";
     }
 
-    @GetMapping("/login")
-    public String login() {
 
+    @GetMapping("/login")
+    public String login(Model model) {
+
+        if(!model.containsAttribute("userLoginBindingModel")){
+            model.addAttribute("userLoginBindingModel", new UserLoginBindingModel());
+            model.addAttribute("notFound", false);
+        }
         return "login";
+    }
+
+    @PostMapping("/login")
+    public String loginConfirm(@Valid UserLoginBindingModel userLoginBindingModel,
+                               BindingResult bindingResult, RedirectAttributes redirectAttributes) {
+
+        if (bindingResult.hasErrors()) {
+            redirectAttributes.addFlashAttribute("userLoginBindingModel", userLoginBindingModel);
+            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.userLoginBindingModel", bindingResult);
+            return "redirect:login";
+        }
+
+        UserServiceModel userServiceModel = this.modelMapper.map(userLoginBindingModel, UserServiceModel.class);
+
+        boolean isLogged = this.userService.login(userServiceModel);
+        if (!isLogged) {
+            redirectAttributes.addFlashAttribute("userLoginBindingModel", userLoginBindingModel);
+            redirectAttributes.addFlashAttribute("notFound", true);
+            return "redirect:login";
+        }
+
+        return "redirect:/home";
+    }
+
+    @GetMapping("/logout")
+    public String logout() {
+
+        this.userService.logout();
+
+        return "redirect:/";
     }
 }
