@@ -51,4 +51,31 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    @Override
+    public boolean login(UserServiceModel userServiceModel) {
+
+        Optional<User> optionalUser = this.userRepository.findByUsername(userServiceModel.getUsername());
+        if (optionalUser.isEmpty()) {
+            log.warn("User not exists.");
+            return false;
+        }
+
+        boolean passMatch = this.passwordEncoder.matches(userServiceModel.getPassword(), optionalUser.get().getPassword());
+        if (!passMatch) {
+            log.warn("Password does not match.");
+            return false;
+        }
+
+        httpSession.setAttribute("userId", optionalUser.get().getId());
+        httpSession.setAttribute("username", optionalUser.get().getUsername());
+        httpSession.setAttribute("loggedIn", true);
+        log.info("Successfully logged user account with username [%s]".formatted(userServiceModel.getUsername()));
+        return true;
+    }
+
+    @Override
+    public void logout() {
+        httpSession.invalidate();
+    }
+
 }
