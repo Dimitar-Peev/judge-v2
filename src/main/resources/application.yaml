@@ -1,0 +1,45 @@
+spring:
+  application:
+    name: judge-v2
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/judge-v2?allowPublicKeyRetrieval=true&useSSL=false&createDatabaseIfNotExist=true&serverTimezone=UTC
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+  jpa:
+    defer-datasource-initialization: true
+    properties:
+      hibernate:
+        format_sql: true
+    hibernate:
+      ddl-auto: update
+    open-in-view: true
+  sql:
+    init:
+      mode: never
+  mvc:
+    hidden method:
+      filter:
+        enabled: true
+  thymeleaf:
+    check-template-location: true
+    cache: false
+    mode: HTML
+    prefix: file:./src/main/resources/templates/
+    encoding: UTF-8
+  web:
+    resources:
+      cache:
+        period: 0
+      static-locations: file:./src/main/resources/static/
+logging:
+  level:
+    org:
+      hibernate:
+        type:
+          descriptor: TRACE
+        SQL: DEBUG
+      nodeValue: WARN
+    blog: WARN
+server:
+  port: 8080
