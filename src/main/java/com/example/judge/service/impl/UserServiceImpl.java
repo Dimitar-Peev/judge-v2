@@ -1,5 +1,6 @@
 package com.example.judge.service.impl;
 
+import com.example.judge.model.entity.Role;
 import com.example.judge.model.entity.RoleName;
 import com.example.judge.model.entity.User;
 import com.example.judge.model.service.UserServiceModel;
@@ -13,6 +14,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @AllArgsConstructor
@@ -66,8 +68,8 @@ public class UserServiceImpl implements UserService {
             return false;
         }
 
-        httpSession.setAttribute("userId", optionalUser.get().getId());
-        httpSession.setAttribute("username", optionalUser.get().getUsername());
+        httpSession.setAttribute("user", optionalUser.get());
+        httpSession.setAttribute("user_id", optionalUser.get().getId());
         httpSession.setAttribute("loggedIn", true);
         log.info("Successfully logged user account with username [%s]".formatted(userServiceModel.getUsername()));
         return true;
@@ -76,6 +78,23 @@ public class UserServiceImpl implements UserService {
     @Override
     public void logout() {
         httpSession.invalidate();
+    }
+
+    @Override
+    public List<String> findAllUsernamesExceptCurrent(String userId) {
+        return this.userRepository.findAllUsernamesExceptCurrent(userId);
+    }
+
+    @Override
+    public void addRoleToUser(String username, String role) {
+
+        User user = this.userRepository.findByUsername(username).orElse(null);
+        if (user != null) {
+            RoleName roleName = RoleName.valueOf(role.toUpperCase());
+            Role roleEntity = this.modelMapper.map(this.roleService.findRole(roleName), Role.class);
+            user.setRole(roleEntity);
+            this.userRepository.saveAndFlush(user);
+        }
     }
 
 }
