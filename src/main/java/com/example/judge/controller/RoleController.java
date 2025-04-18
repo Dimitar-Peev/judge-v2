@@ -1,6 +1,7 @@
 package com.example.judge.controller;
 
 import com.example.judge.model.binding.RoleAddBindingModel;
+import com.example.judge.model.entity.User;
 import com.example.judge.service.UserService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -21,9 +22,15 @@ import java.util.List;
 public class RoleController {
 
     private final UserService userService;
+    private final HttpSession httpSession;
 
     @GetMapping("/add")
     public String add(Model model, HttpSession session) {
+
+        User user = (User) httpSession.getAttribute("user");
+        if (!user.isAdmin()){
+            return "redirect:/";
+        }
 
         String userId = session.getAttribute("user_id").toString();
         List<String> allUsernames = this.userService.findAllUsernamesExceptCurrent(userId);
