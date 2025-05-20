@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 @Data
 public class HomeworkServiceModel {
 
+    private String id;
     private LocalDateTime addedOn;
     private String gitAddress;
     private UserServiceModel author;
