@@ -5,6 +5,7 @@ import lombok.Data;
 @Data
 public class CommentServiceModel {
 
+    private String id;
     private int score;
     private String textContent;
     private UserServiceModel author;
