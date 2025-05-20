@@ -1,10 +1,14 @@
 package com.example.judge.controller;
 
+import com.example.judge.model.binding.CommentAddBindingModel;
 import com.example.judge.model.binding.HomeworkAddBindingModel;
 import com.example.judge.model.entity.User;
+import com.example.judge.model.service.CommentServiceModel;
 import com.example.judge.model.service.ExerciseServiceModel;
 import com.example.judge.model.service.HomeworkServiceModel;
 import com.example.judge.model.service.UserServiceModel;
+import com.example.judge.model.view.HomeworkViewModel;
+import com.example.judge.service.CommentService;
 import com.example.judge.service.ExerciseService;
 import com.example.judge.service.HomeworkService;
 import jakarta.servlet.http.HttpSession;
@@ -31,6 +35,7 @@ public class HomeworkController {
     private final ExerciseService exerciseService;
     private final ModelMapper modelMapper;
     private final HomeworkService homeworkService;
+    private final CommentService commentService;
 
     @GetMapping("/add")
     public String add(Model model) {
@@ -71,6 +76,42 @@ public class HomeworkController {
         homeworkServiceModel.setAuthor(modelMapper.map(user, UserServiceModel.class));
 
         this.homeworkService.add(homeworkServiceModel);
+
+        return "redirect:/";
+    }
+
+    @GetMapping("/check")
+    public String check(Model model) {
+
+        if (!model.containsAttribute("commentAddBindingModel")) {
+            model.addAttribute("commentAddBindingModel", new CommentAddBindingModel());
+        }
+
+        HomeworkServiceModel homeworksByScoring = this.homeworkService.findHomeworksByScoring();
+
+        HomeworkViewModel homework = modelMapper.map(homeworksByScoring, HomeworkViewModel.class);
+
+        model.addAttribute("homework", homework);
+
+        return "homework-check";
+    }
+
+    @PostMapping("/check")
+    public String checkConfirm(@Valid @ModelAttribute("commentAddBindingModel") CommentAddBindingModel commentAddBindingModel,
+                               BindingResult bindingResult, RedirectAttributes redirectAttributes, HttpSession httpSession) {
+
+        if (bindingResult.hasErrors()) {
+            redirectAttributes.addFlashAttribute("commentAddBindingModel", commentAddBindingModel);
+            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.commentAddBindingModel", bindingResult);
+            return "redirect:check";
+        }
+
+        CommentServiceModel commentServiceModel = this.modelMapper.map(commentAddBindingModel, CommentServiceModel.class);
+        commentServiceModel.setHomework(this.homeworkService.findById(commentAddBindingModel.getHomeworkId()));
+        User user = (User) httpSession.getAttribute("user");
+        commentServiceModel.setAuthor(modelMapper.map(user, UserServiceModel.class));
+
+        this.commentService.add(commentServiceModel);
 
         return "redirect:/";
     }
