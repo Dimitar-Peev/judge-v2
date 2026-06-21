@@ -1,9 +1,9 @@
-<th:block>
-    <head>
+<th:block xmlns:th="http://www.thymeleaf.org">
+    <head th:fragment="head(title)">
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
-        <title>Judge v2</title>
+        <title th:text="${title}">Judge v2</title>
 
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600">
         <link rel="stylesheet" href="/css/bootstrap.min.css">
@@ -13,7 +13,8 @@
         <!--    Calendar-->
         <script src="https://cdn.jsdelivr.net/npm/simple-jscalendar@1.4.4/source/jsCalendar.min.js"
                 integrity="sha384-0LaRLH/U5g8eCAwewLGQRyC/O+g0kXh8P+5pWpzijxwYczD3nKETIqUyhuA8B/UB"
-                crossorigin="anonymous"></script>
+                crossorigin="anonymous">
+        </script>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/simple-jscalendar@1.4.4/source/jsCalendar.min.css"
               integrity="sha384-44GnAqZy9yUojzFPjdcUpP822DGm1ebORKY8pe6TkHuqJ038FANyfBYBpRvw8O9w"
               crossorigin="anonymous">
