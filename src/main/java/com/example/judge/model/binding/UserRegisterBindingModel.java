@@ -24,7 +24,7 @@ public class UserRegisterBindingModel {
     private String email;
 
     @NotBlank(message = "GitHub profile cannot be empty")
-    @Pattern(regexp = "https:\\/\\/github\\.com\\/.+", message = "Enter valid github address")
+    @Pattern(regexp = "https://github\\.com/.+", message = "Enter valid github address")
     private String git;
 
 }
