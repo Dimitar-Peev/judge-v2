@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 
-    <th:block th:insert="~{fragments/head}"></th:block>
+    <th:block th:insert="~{fragments/head::head('Judge v2: Register')}"></th:block>
 
     <body>
         <div class="container ">
@@ -37,7 +37,10 @@
                     <div class="bg-white tm-block">
                         <div class="row mt-2">
                             <div class="col-12">
-                                <form th:action="@{/users/register}" th:method="post" th:object="${userRegisterBindingModel}" class="tm-login-form">
+                                <form th:action="@{/users/register}"
+                                      th:method="post"
+                                      th:object="${userRegisterBindingModel}"
+                                      class="tm-login-form">
 
                                     <h3 th:if="${isExists}" class="text-center">
                                         <span class="badge badge-pill badge-light text-danger mb-4">User already exists</span>
@@ -47,7 +50,7 @@
                                         <label for="username"
                                                class="col-xl-4 col-lg-4 col-md-4 col-sm-5 col-form-label">Username</label>
                                         <input name="username" type="text" th:field="*{username}"
-                                               th:errorclass="'bg-danger'"
+                                               th:errorclass="'alert-danger'"
                                                class="form-control validate col-xl-9 col-lg-8 col-md-8 col-sm-7"
                                                id="username" placeholder="Enter username">
                                         <div class="mx-auto">
@@ -56,10 +59,12 @@
                                             </small>
                                         </div>
                                     </div>
+
                                     <div class="input-group mt-3">
                                         <label for="password"
                                                class="col-xl-4 col-lg-4 col-md-4 col-sm-5 col-form-label">Password</label>
-                                        <input name="password" type="password" th:field="*{password}" th:errorclass="'bg-danger'"
+                                        <input name="password" type="password" th:field="*{password}"
+                                               th:errorclass="'alert-danger'"
                                                class="form-control validate"
                                                id="password" placeholder="Enter password">
                                         <div class="mx-auto">
@@ -73,36 +78,37 @@
                                             Confirm Password
                                         </label>
                                         <input name="confirmPassword" type="password" th:field="*{confirmPassword}"
-                                               th:errorclass="'bg-danger'"
+                                               th:errorclass="'alert-danger'"
                                                class="form-control validate"
                                                id="confirmPassword" placeholder="Confirm password">
                                     </div>
+
                                     <div class="input-group mt-3">
                                         <label for="email" class="col-xl-4 col-lg-4 col-md-4 col-sm-5 col-form-label">Email</label>
-                                        <input name="email" type="email" th:field="*{email}" th:errorclass="'bg-danger'"
+                                        <input name="email" type="email" th:field="*{email}"
+                                               th:errorclass="'alert-danger'"
                                                class="form-control validate" id="email"
                                                placeholder="Enter email">
-
                                     </div>
                                     <div class="mx-auto text-center">
                                         <small th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="text-danger">
                                             Enter valid email address
                                         </small>
                                     </div>
+
                                     <div class="input-group mt-3">
-                                        <label for="git"
-                                               class="col-xl-4 col-lg-4 col-md-4 col-sm-5 col-form-label">Git</label>
-                                        <input name="git" type="text" th:field="*{git}" th:errorclass="'bg-danger'"
+                                        <label for="git" class="col-xl-4 col-lg-4 col-md-4 col-sm-5 col-form-label">Git</label>
+                                        <input name="git" type="text" th:field="*{git}"
+                                               th:errorclass="'alert-danger'"
                                                class="form-control validate" id="git"
                                                placeholder="Enter git">
-
                                     </div>
                                     <div class="mx-auto text-center align-content-center">
-                                        <small th:if="${#fields.hasErrors('git')}" th:errors="*{git}"
-                                               class="text-danger">
+                                        <small th:if="${#fields.hasErrors('git')}" th:errors="*{git}" class="text-danger">
                                             Enter git address following this pattern
                                         </small>
                                     </div>
+
                                     <div class="input-group mt-3">
                                         <button type="submit" class="btn btn-primary d-inline-block mx-auto">
                                             Register
