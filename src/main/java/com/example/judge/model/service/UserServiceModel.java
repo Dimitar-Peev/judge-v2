@@ -1,7 +1,9 @@
 package com.example.judge.model.service;
 
-import com.example.judge.model.entity.Role;
 import lombok.Data;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 public class UserServiceModel {
@@ -11,6 +13,7 @@ public class UserServiceModel {
     private String password;
     private String email;
     private String git;
-    private Role role;
+    private RoleServiceModel role;
+    private Set<String> homeworks = new HashSet<>();
 
 }
