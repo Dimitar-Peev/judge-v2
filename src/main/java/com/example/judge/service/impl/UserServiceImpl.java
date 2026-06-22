@@ -1,8 +1,10 @@
 package com.example.judge.service.impl;
 
+import com.example.judge.exception.ResourceNotFoundException;
 import com.example.judge.model.entity.Role;
 import com.example.judge.model.entity.RoleName;
 import com.example.judge.model.entity.User;
+import com.example.judge.model.service.RoleServiceModel;
 import com.example.judge.model.service.UserServiceModel;
 import com.example.judge.repository.UserRepository;
 import com.example.judge.service.RoleService;
@@ -26,13 +28,11 @@ public class UserServiceImpl implements UserService {
     private final ModelMapper modelMapper;
     private final PasswordEncoder passwordEncoder;
     private final RoleService roleService;
-    private final HttpSession httpSession;
 
     @Override
     public boolean register(UserServiceModel userServiceModel) {
 
-        Optional<User> existingUser =
-                this.userRepository.findByUsernameOrEmail(userServiceModel.getUsername(), userServiceModel.getEmail());
+        Optional<User> existingUser = getByUsernameOrEmail(userServiceModel);
 
         if (existingUser.isPresent()) {
             log.warn("Failed to create user account. User already exists.");
@@ -42,19 +42,21 @@ public class UserServiceImpl implements UserService {
             user.setPassword(this.passwordEncoder.encode(userServiceModel.getPassword()));
 
             if (this.userRepository.count() == 0) {
-                user.setRole(this.roleService.findRole(RoleName.ADMIN));
+                RoleServiceModel adminRoleModel = this.roleService.findByName(RoleName.ADMIN);
+                user.setRole(this.modelMapper.map(adminRoleModel, Role.class));
             } else {
-                user.setRole(this.roleService.findRole(RoleName.USER));
+                RoleServiceModel userRoleModel = this.roleService.findByName(RoleName.USER);
+                user.setRole(this.modelMapper.map(userRoleModel, Role.class));
             }
 
-            this.userRepository.save(user);
-            log.info("Successfully created new user account for username [%s] and id [%s]".formatted(user.getUsername(), user.getId()));
+            User savedUser = this.userRepository.save(user);
+            log.info("Successfully created new user account for username [{}] and id [{}]", savedUser.getUsername(), savedUser.getId());
             return true;
         }
     }
 
     @Override
-    public boolean login(UserServiceModel userServiceModel) {
+    public boolean login(UserServiceModel userServiceModel, HttpSession httpSession) {
 
         Optional<User> optionalUser = this.userRepository.findByUsername(userServiceModel.getUsername());
         if (optionalUser.isEmpty()) {
@@ -68,15 +70,19 @@ public class UserServiceImpl implements UserService {
             return false;
         }
 
-        httpSession.setAttribute("user", optionalUser.get());
-        httpSession.setAttribute("user_id", optionalUser.get().getId());
-        httpSession.setAttribute("loggedIn", true);
-        log.info("Successfully logged user account with username [%s]".formatted(userServiceModel.getUsername()));
+        UserServiceModel existingUser = this.modelMapper.map(optionalUser.get(), UserServiceModel.class);
+        existingUser.setPassword(null);
+
+        httpSession.setAttribute("user_id", existingUser.getId());
+        httpSession.setAttribute("role", existingUser.getRole().getName());
+        httpSession.setAttribute("username", existingUser.getUsername());
+
+        log.info("Successfully logged user account with username [{}]", existingUser.getUsername());
         return true;
     }
 
     @Override
-    public void logout() {
+    public void logout(HttpSession httpSession) {
         httpSession.invalidate();
     }
 
@@ -88,13 +94,29 @@ public class UserServiceImpl implements UserService {
     @Override
     public void addRoleToUser(String username, String role) {
 
-        User user = this.userRepository.findByUsername(username).orElse(null);
-        if (user != null) {
-            RoleName roleName = RoleName.valueOf(role.toUpperCase());
-            Role roleEntity = this.modelMapper.map(this.roleService.findRole(roleName), Role.class);
-            user.setRole(roleEntity);
-            this.userRepository.saveAndFlush(user);
+        User user = getByUsername(username);
+        RoleName roleName = RoleName.valueOf(role.toUpperCase());
+
+        if (user.getRole() != null && user.getRole().getName() == roleName) {
+            log.info("User [{}] already has role [{}]. No changes made.", username, roleName);
+            return;
         }
+
+        RoleServiceModel roleServiceByName = this.roleService.findByName(roleName);
+        Role roleEntity = this.modelMapper.map(roleServiceByName, Role.class);
+        user.setRole(roleEntity);
+        this.userRepository.save(user);
+
+        log.info("Successfully changed user role for user [{}] to [{}]", user.getUsername(), user.getRole().getName());
+    }
+
+    private User getByUsername(String name) {
+        return this.userRepository.findByUsername(name)
+                .orElseThrow(() -> new ResourceNotFoundException("User with username [%s] was not found.".formatted(name)));
+    }
+
+    private Optional<User> getByUsernameOrEmail(UserServiceModel userServiceModel) {
+        return this.userRepository.findByUsernameOrEmail(userServiceModel.getUsername(), userServiceModel.getEmail());
     }
 
 }
