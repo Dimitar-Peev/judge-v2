@@ -11,6 +11,8 @@ import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @AllArgsConstructor
 @Service
 public class RoleServiceImpl implements RoleService {
@@ -38,5 +40,10 @@ public class RoleServiceImpl implements RoleService {
                 .findByName(roleName)
                 .map(role -> this.modelMapper.map(role, RoleServiceModel.class))
                 .orElseThrow(() -> new ResourceNotFoundException("Role not found"));
+    }
+
+    @Override
+    public List<String> findAllRoleNames() {
+        return this.roleRepository.findAllRoleNames();
     }
 }
