@@ -1,7 +1,7 @@
 package com.example.judge.controller;
 
 import com.example.judge.model.binding.RoleAddBindingModel;
-import com.example.judge.model.entity.User;
+import com.example.judge.service.RoleService;
 import com.example.judge.service.UserService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -10,11 +10,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
+
+import static com.example.judge.common.Constants.BINDING_MODEL;
 
 @RequiredArgsConstructor
 @Controller
@@ -22,32 +24,42 @@ import java.util.List;
 public class RoleController {
 
     private final UserService userService;
-    private final HttpSession httpSession;
+    private final RoleService roleService;
 
     @GetMapping("/add")
-    public String add(Model model, HttpSession session) {
+    public String add(Model model, HttpSession httpSession) {
 
-        User user = (User) httpSession.getAttribute("user");
-        if (!user.isAdmin()){
+        String role = httpSession.getAttribute("role").toString();
+        if (!"ADMIN".equals(role)) {
             return "redirect:/";
         }
 
-        String userId = session.getAttribute("user_id").toString();
+        if (!model.containsAttribute("roleAddBindingModel")) {
+            model.addAttribute("roleAddBindingModel", new RoleAddBindingModel());
+        }
+
+        String userId = httpSession.getAttribute("user_id").toString();
         List<String> allUsernames = this.userService.findAllUsernamesExceptCurrent(userId);
         model.addAttribute("usernames", allUsernames);
+
+        List<String> roles = this.roleService.findAllRoleNames();
+        model.addAttribute("allRoles", roles);
 
         return "role-add";
     }
 
     @PostMapping("/add")
-    public String addConfirm(@Valid @ModelAttribute("roleAddBindingModel") RoleAddBindingModel roleAddBindingModel,
-                             BindingResult bindingResult) {
+    public String addConfirm(@Valid RoleAddBindingModel roleAddBindingModel, BindingResult bindingResult,
+                             RedirectAttributes redirectAttributes) {
 
         if (bindingResult.hasErrors()) {
-            return "role-add";
+            redirectAttributes.addFlashAttribute("roleAddBindingModel", roleAddBindingModel);
+            redirectAttributes.addFlashAttribute(BINDING_MODEL + "roleAddBindingModel", bindingResult);
+            return "redirect:/roles/add";
         }
 
         this.userService.addRoleToUser(roleAddBindingModel.getUsername(), roleAddBindingModel.getRole());
+
         return "redirect:/";
     }
 }
