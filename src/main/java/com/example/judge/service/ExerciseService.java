@@ -4,5 +4,6 @@ import com.example.judge.model.service.ExerciseServiceModel;
 
 public interface ExerciseService {
 
-    void add(ExerciseServiceModel exerciseServiceModel);
+    ExerciseServiceModel add(ExerciseServiceModel exerciseServiceModel);
+    
 }
