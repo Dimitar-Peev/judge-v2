@@ -18,14 +18,14 @@ public class ExerciseServiceImpl implements ExerciseService {
     private final ModelMapper modelMapper;
 
     @Override
-    public void add(ExerciseServiceModel exerciseServiceModel) {
+    public ExerciseServiceModel add(ExerciseServiceModel exerciseServiceModel) {
 
         Exercise exercise = modelMapper.map(exerciseServiceModel, Exercise.class);
-        this.exerciseRepository.save(exercise);
+        Exercise saved = this.exerciseRepository.save(exercise);
         log.info("Successfully added exercise.");
 
+        return modelMapper.map(saved, ExerciseServiceModel.class);
     }
-
 
 }
 
