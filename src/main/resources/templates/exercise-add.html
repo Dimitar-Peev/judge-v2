@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
-    <th:block th:insert="~{fragments/head}"></th:block>
+    <th:block th:insert="~{fragments/head::head('Judge v2: Add Exercise')}"></th:block>
 
     <body>
         <div class="container">
@@ -10,7 +10,7 @@
                     <th:block th:insert="~{fragments/nav}"></th:block>
                 </div>
             </div>
-            <!-- row -->
+
             <div class="row tm-mt-big justify-content-center">
                 <div class="col-xl-8 col-lg-10 col-md-12 col-sm-12">
                     <div class="bg-white tm-block">
@@ -29,13 +29,13 @@
                                         <label for="name" class="col-xl-4 col-lg-4 col-md-4 col-sm-5 col-form-label">
                                             Name
                                         </label>
-                                        <input id="name" name="name" type="text" th:field="*{name}"
-                                               th:errorclass="bg-danger"
+                                        <input id="name" name="name" type="text"
+                                               th:field="*{name}" th:errorclass="alert-danger"
                                                class="form-control validate col-xl-9 col-lg-8 col-md-8 col-sm-7"/>
                                     </div>
 
                                     <div class="input-group mb-3 justify-content-center">
-                                        <small th:if="${#fields.hasErrors('name')}" th:errors="*{name}"  class="text-danger">
+                                        <small th:if="${#fields.hasErrors('name')}" th:errors="*{name}" class="text-danger">
                                             Exercise name length must be more than 2 characters
                                         </small>
                                     </div>
@@ -45,7 +45,7 @@
                                             StartedOn Date
                                         </label>
                                         <input id="startedOn" name="startedOn" type="datetime-local"
-                                               th:field="*{startedOn}" th:errorclass="bg-danger"
+                                               th:field="*{startedOn}" th:errorclass="alert-danger"
                                                class="form-control validate col-xl-9 col-lg-8 col-md-8 col-sm-7"
                                                data-large-mode="true"/>
                                     </div>
@@ -61,7 +61,7 @@
                                             Due Date
                                         </label>
                                         <input id="dueDate" name="dueDate" type="datetime-local"
-                                               th:field="*{dueDate}" th:errorclass="bg-danger"
+                                               th:field="*{dueDate}" th:errorclass="alert-danger"
                                                class="form-control validate col-xl-9 col-lg-8 col-md-8 col-sm-7"
                                                data-large-mode="true"/>
                                     </div>
