@@ -9,6 +9,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @AllArgsConstructor
 @Slf4j
 @Service
@@ -25,6 +27,19 @@ public class ExerciseServiceImpl implements ExerciseService {
         log.info("Successfully added exercise.");
 
         return modelMapper.map(saved, ExerciseServiceModel.class);
+    }
+
+    @Override
+    public List<String> findAllExerciseNames() {
+        return this.exerciseRepository.findAllExerciseNames();
+    }
+
+    @Override
+    public ExerciseServiceModel findByName(String exercise) {
+        return this.exerciseRepository.findByName(exercise)
+                .map(ex -> this.modelMapper.map(ex, ExerciseServiceModel.class))
+//                .orElseThrow(() -> new ResourceNotFoundException("Exercise not found"));
+                .orElse(null);
     }
 
 }
