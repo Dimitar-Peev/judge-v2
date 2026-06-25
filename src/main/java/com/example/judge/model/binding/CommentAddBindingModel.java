@@ -8,11 +8,11 @@ import lombok.Data;
 @Data
 public class CommentAddBindingModel {
 
-    @Min(value = 2, message = "Score must be between 2 and 6 inclusive!")
-    @Max(value = 6, message = "Score must be between 2 and 6 inclusive!")
+    @Min(value = 0, message = "The minimum score can be 0%")
+    @Max(value = 100, message = "The maximum score can be 100%")
     private int score;
 
-    @Size(min = 3, message = "Comment text content must be more than 3 characters!")
+    @Size(min = 3, message = "Comment text content must be more than 3 characters")
     private String textContent;
 
     private String homeworkId;
