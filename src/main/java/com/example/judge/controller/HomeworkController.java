@@ -27,6 +27,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static com.example.judge.common.Constants.BINDING_MODEL;
+
 @RequiredArgsConstructor
 @Controller
 @RequestMapping("/homework")
@@ -45,37 +47,37 @@ public class HomeworkController {
             model.addAttribute("isLate", false);
         }
 
-        List<String> allExerciseNames = exerciseService.findAllExerciseNames();
+        List<String> allExerciseNames = this.exerciseService.findAllExerciseNames();
         model.addAttribute("allExercises", allExerciseNames);
 
         return "homework-add";
     }
 
     @PostMapping("/add")
-    public String addConfirm(@Valid @ModelAttribute("homeworkAddBindingModel") HomeworkAddBindingModel homeworkAddBindingModel,
-                             BindingResult bindingResult, RedirectAttributes redirectAttributes, HttpSession httpSession) {
+    public String addConfirm(@Valid HomeworkAddBindingModel homeworkAddBindingModel, BindingResult bindingResult,
+                             RedirectAttributes redirectAttributes, HttpSession httpSession) {
 
-        ExerciseServiceModel exerciseServiceModel = exerciseService.findByName(homeworkAddBindingModel.getExercise());
+        if (bindingResult.hasErrors()) {
+            redirectAttributes.addFlashAttribute("homeworkAddBindingModel", homeworkAddBindingModel);
+            redirectAttributes.addFlashAttribute(BINDING_MODEL + "homeworkAddBindingModel", bindingResult);
+            return "redirect:/homework/add";
+        }
+
+        ExerciseServiceModel exerciseServiceModel = this.exerciseService.findByName(homeworkAddBindingModel.getExercise());
         if (exerciseServiceModel == null) {
-            return "redirect:add";
+            return "redirect:/homework/add";
         }
 
         boolean isLate = exerciseServiceModel.getDueDate().isBefore(LocalDateTime.now());
 
-        if (bindingResult.hasErrors() || isLate) {
-            redirectAttributes.addFlashAttribute("homeworkAddBindingModel", homeworkAddBindingModel);
-            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.homeworkAddBindingModel", bindingResult);
+        if (isLate) {
             redirectAttributes.addFlashAttribute("isLate", true);
-            return "redirect:add";
+            return "redirect:/homework/add";
         }
 
-        HomeworkServiceModel homeworkServiceModel = modelMapper.map(homeworkAddBindingModel, HomeworkServiceModel.class);
-        homeworkServiceModel.setAddedOn(LocalDateTime.now());
-        homeworkServiceModel.setExercise(exerciseServiceModel);
-        User user = (User) httpSession.getAttribute("user");
-        homeworkServiceModel.setAuthor(modelMapper.map(user, UserServiceModel.class));
+        HomeworkServiceModel homeworkServiceModel = this.modelMapper.map(homeworkAddBindingModel, HomeworkServiceModel.class);
 
-        this.homeworkService.add(homeworkServiceModel);
+        this.homeworkService.add(homeworkServiceModel, exerciseServiceModel, httpSession);
 
         return "redirect:/";
     }
@@ -89,7 +91,7 @@ public class HomeworkController {
 
         HomeworkServiceModel homeworksByScoring = this.homeworkService.findHomeworksByScoring();
 
-        HomeworkViewModel homework = modelMapper.map(homeworksByScoring, HomeworkViewModel.class);
+        HomeworkViewModel homework = this.modelMapper.map(homeworksByScoring, HomeworkViewModel.class);
 
         model.addAttribute("homework", homework);
 
