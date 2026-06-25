@@ -3,14 +3,16 @@ spring:
     name: judge-v2
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/judge-v2?allowPublicKeyRetrieval=true&useSSL=false&createDatabaseIfNotExist=true&serverTimezone=UTC
+    url: jdbc:mysql://localhost:3306/judge-v2?allowPublicKeyRetrieval=true&useSSL=false&createDatabaseIfNotExist=true&serverTimezone=Europe/Sofia
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
   jpa:
+    database-platform: org.hibernate.dialect.MySQL8Dialect
     defer-datasource-initialization: true
     properties:
       hibernate:
         format_sql: true
+        dialect: org.hibernate.dialect.MySQL8Dialect
     hibernate:
       ddl-auto: update
     open-in-view: true
@@ -22,11 +24,12 @@ spring:
       filter:
         enabled: true
   thymeleaf:
+    prefix: file:./src/main/resources/templates/
+    suffix: .html
+    mode: HTML
+    encoding: UTF-8
     check-template-location: true
     cache: false
-    mode: HTML
-    prefix: file:./src/main/resources/templates/
-    encoding: UTF-8
   web:
     resources:
       cache:
