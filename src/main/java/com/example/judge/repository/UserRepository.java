@@ -18,4 +18,11 @@ public interface UserRepository extends JpaRepository<User, String> {
 
     @Query("SELECT u.username FROM User u WHERE u.id <> :currentUserId")
     List<String> findAllUsernamesExceptCurrent(@Param("currentUserId") String currentUserId);
+
+    @Query("SELECT u FROM User u " +
+            "LEFT JOIN FETCH u.homeworks h " +
+            "LEFT JOIN FETCH h.exercise " +
+            "WHERE u.id = :id")
+    Optional<User> findByIdWithHomeworksAndExercises(@Param("id") String id);
+
 }
