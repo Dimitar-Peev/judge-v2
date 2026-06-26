@@ -11,6 +11,7 @@ import com.example.judge.model.view.HomeworkViewModel;
 import com.example.judge.service.CommentService;
 import com.example.judge.service.ExerciseService;
 import com.example.judge.service.HomeworkService;
+import com.example.judge.utils.DtoMapper;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -44,6 +45,9 @@ public class HomeworkController {
 
         if (!model.containsAttribute("homeworkAddBindingModel")) {
             model.addAttribute("homeworkAddBindingModel", new HomeworkAddBindingModel());
+        }
+
+        if (!model.containsAttribute("isLate")) {
             model.addAttribute("isLate", false);
         }
 
@@ -117,5 +121,4 @@ public class HomeworkController {
 
         return "redirect:/";
     }
-
 }
