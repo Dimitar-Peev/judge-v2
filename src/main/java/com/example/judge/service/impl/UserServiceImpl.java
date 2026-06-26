@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Slf4j
@@ -108,6 +109,22 @@ public class UserServiceImpl implements UserService {
         this.userRepository.save(user);
 
         log.info("Successfully changed user role for user [{}] to [{}]", user.getUsername(), user.getRole().getName());
+    }
+
+    @Override
+    public UserServiceModel findById(String id) {
+        Optional<User> byIdWithHomeworksAndExercises = this.userRepository.findByIdWithHomeworksAndExercises(id);
+
+        return byIdWithHomeworksAndExercises
+                .map(user -> {
+                    UserServiceModel serviceModel = this.modelMapper.map(user, UserServiceModel.class);
+                    serviceModel.setHomeworks(user.getHomeworks()
+                            .stream()
+                            .map(homework -> homework.getExercise().getName())
+                            .collect(Collectors.toSet()));
+                    return serviceModel;
+                })
+                .orElseThrow(() -> new ResourceNotFoundException("User with id [%s] was not found.".formatted(id)));
     }
 
     private User getByUsername(String name) {
