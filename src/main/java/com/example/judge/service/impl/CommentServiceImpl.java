@@ -10,9 +10,11 @@ import com.example.judge.service.HomeworkService;
 import com.example.judge.service.UserService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class CommentServiceImpl implements CommentService {
@@ -34,8 +36,9 @@ public class CommentServiceImpl implements CommentService {
         Comment comment = this.modelMapper.map(commentServiceModel, Comment.class);
 
         Comment saved = this.commentRepository.save(comment);
+        log.info("Successfully added comment with score [{}] for homework [{}]", comment.getScore(), homeworkServiceModel.getId());
 
         return this.modelMapper.map(saved, CommentServiceModel.class);
     }
 
- }
+}
