@@ -2,11 +2,9 @@ package com.example.judge.controller;
 
 import com.example.judge.model.binding.CommentAddBindingModel;
 import com.example.judge.model.binding.HomeworkAddBindingModel;
-import com.example.judge.model.entity.User;
 import com.example.judge.model.service.CommentServiceModel;
 import com.example.judge.model.service.ExerciseServiceModel;
 import com.example.judge.model.service.HomeworkServiceModel;
-import com.example.judge.model.service.UserServiceModel;
 import com.example.judge.model.view.HomeworkViewModel;
 import com.example.judge.service.CommentService;
 import com.example.judge.service.ExerciseService;
@@ -20,7 +18,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -103,21 +100,18 @@ public class HomeworkController {
     }
 
     @PostMapping("/check")
-    public String checkConfirm(@Valid @ModelAttribute("commentAddBindingModel") CommentAddBindingModel commentAddBindingModel,
-                               BindingResult bindingResult, RedirectAttributes redirectAttributes, HttpSession httpSession) {
+    public String checkConfirm(@Valid CommentAddBindingModel commentAddBindingModel, BindingResult bindingResult,
+                               RedirectAttributes redirectAttributes, HttpSession httpSession) {
 
         if (bindingResult.hasErrors()) {
             redirectAttributes.addFlashAttribute("commentAddBindingModel", commentAddBindingModel);
-            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.commentAddBindingModel", bindingResult);
-            return "redirect:check";
+            redirectAttributes.addFlashAttribute(BINDING_MODEL + "commentAddBindingModel", bindingResult);
+            return "redirect:/homework/check";
         }
 
-        CommentServiceModel commentServiceModel = this.modelMapper.map(commentAddBindingModel, CommentServiceModel.class);
-        commentServiceModel.setHomework(this.homeworkService.findById(commentAddBindingModel.getHomeworkId()));
-        User user = (User) httpSession.getAttribute("user");
-        commentServiceModel.setAuthor(modelMapper.map(user, UserServiceModel.class));
+        CommentServiceModel commentServiceModel = DtoMapper.mapCommentAddBindingModelToCommentServiceModel(commentAddBindingModel);
 
-        this.commentService.add(commentServiceModel);
+        CommentServiceModel added = this.commentService.add(commentServiceModel, httpSession);
 
         return "redirect:/";
     }
