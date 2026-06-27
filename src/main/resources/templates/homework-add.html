@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
-    <th:block th:insert="~{fragments/head}"></th:block>
+    <th:block th:insert="~{fragments/head::head('Judge v2: Add Homework')}"></th:block>
 
     <body>
         <div class="container">
@@ -10,7 +10,7 @@
                     <th:block th:insert="~{fragments/nav}"></th:block>
                 </div>
             </div>
-            <!-- row -->
+
             <div class="row tm-mt-big justify-content-center">
                 <div class="col-xl-8 col-lg-10 col-md-12 col-sm-12 ">
                     <div class="bg-white tm-block">
@@ -21,7 +21,10 @@
                         </div>
                         <div class="row mt-4 tm-edit-product-row ">
                             <div class="col-xl-7 col-lg-7 col-md-12">
-                                <form th:action="@{/homework/add}" th:method="post" th:object="${homeworkAddBindingModel}" class="tm-edit-product-form">
+                                <form th:action="@{/homework/add}"
+                                      th:method="post"
+                                      th:object="${homeworkAddBindingModel}"
+                                      class="tm-edit-product-form">
 
                                     <div class="input-group mb-3">
                                         <h1 th:if="${isLate}" class="text-danger">You late</h1>
@@ -33,29 +36,45 @@
                                         <select class="custom-select col-xl-9 col-lg-8 col-md-8 col-sm-7" id="exercise"
                                                 name="exercise">
                                             <option value="" selected>Select exercise</option>
-                                            <option th:each="exercise : ${allExercises}" th:text="${exercise}" th:value="${exercise}">Exercise</option>
+                                            <option th:each="e : ${allExercises}"
+                                                    th:text="${e}"
+                                                    th:value="${e}"
+                                                    th:selected="*{exercise} == ${e}">
+                                                Exercise
+                                            </option>
                                         </select>
+                                        <div class="w-100"></div>
+                                        <div class="mx-auto text-center align-content-center" th:if="${#fields.hasErrors('exercise')}">
+                                            <small th:errors="*{exercise}" class="text-danger">
+                                                Exercise error
+                                            </small>
+                                        </div>
                                     </div>
+
                                     <div class="input-group mb-3">
                                         <label for="gitAddress"  class="col-xl-4 col-lg-4 col-md-4 col-sm-5 col-form-label">
                                             Github address
                                         </label>
-                                        <input id="gitAddress" name="gitAddress" type="text" th:field="*{gitAddress}" th:errorclass="bg-danger"
+                                        <input id="gitAddress" name="gitAddress" type="text" th:field="*{gitAddress}" th:errorclass="alert-danger"
                                                class="form-control validate col-xl-9 col-lg-8 col-md-8 col-sm-7">
                                     </div>
 
-                                    <small th:if="${#fields.hasErrors('gitAddress')}" th:errors="*{gitAddress}" class="text-danger">Invalid github address</small>
+                                    <small th:if="${#fields.hasErrors('gitAddress')}" th:errors="*{gitAddress}" class="text-danger">
+                                        Invalid github address
+                                    </small>
 
                                     <div class="input-group mb-3">
                                         <div class="ml-auto col-xl-8 col-lg-8 col-md-8 col-sm-7 pl-0">
-                                            <button type="submit" class="btn btn-primary">Add </button>
+                                            <button type="submit" class="btn btn-primary">Add</button>
                                         </div>
                                     </div>
                                 </form>
                             </div>
+
                             <div class="col-xl-4 col-lg-4 col-md-12 mx-auto mb-4">
                                 <img src="/img/homework.png" alt="Homework picture" width="100%">
                             </div>
+
                         </div>
                     </div>
 
