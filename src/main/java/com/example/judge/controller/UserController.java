@@ -3,6 +3,7 @@ package com.example.judge.controller;
 import com.example.judge.model.binding.UserLoginBindingModel;
 import com.example.judge.model.binding.UserRegisterBindingModel;
 import com.example.judge.model.service.UserServiceModel;
+import com.example.judge.model.view.UserProfileViewModel;
 import com.example.judge.service.UserService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -14,6 +15,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import static com.example.judge.common.Constants.BINDING_MODEL;
@@ -100,6 +102,18 @@ public class UserController {
         this.userService.logout(httpSession);
 
         return "redirect:/";
+    }
+
+    @GetMapping("/profile")
+    public String profile(@RequestParam("id") String id, Model model) {
+
+        UserServiceModel userServiceModel = this.userService.findById(id);
+
+        UserProfileViewModel userProfileViewModel = this.modelMapper.map(userServiceModel, UserProfileViewModel.class);
+
+        model.addAttribute("userProfile", userProfileViewModel);
+
+        return "profile";
     }
 
 }
