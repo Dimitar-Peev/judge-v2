@@ -11,7 +11,7 @@
                         <th:block th:insert="~{fragments/nav}"></th:block>
                     </div>
                 </div>
-                <!-- row -->
+
                 <div class="row tm-content-row tm-mt-big">
 
                     <div class="tm-col tm-col-big">
@@ -31,7 +31,6 @@
                         </div>
                     </div>
 
-
                     <div class="tm-col tm-col-big">
                         <div class="bg-white tm-block h-100">
                             <div class="row">
@@ -44,9 +43,9 @@
                             </div>
                             <ol class="tm-list-group tm-list-group-alternate-color tm-list-group-pad-big">
 
-                                <li class="tm-list-group-item">Top student one</li>
-                                <li class="tm-list-group-item">Top student two</li>
-                                <li class="tm-list-group-item">Top student three</li>
+                                <li th:each="student : ${homeViewModel.students}" th:text="${student}" class="tm-list-group-item">
+                                    Top student
+                                </li>
 
                             </ol>
                         </div>
@@ -143,8 +142,8 @@
             google.charts.setOnLoadCallback(drawGauge);
 
             function drawGauge() {
-                //ToDo total count of register users
-                let totalStudents = 20;
+
+                let totalStudents = [[${homeViewModel.totalUsersCount}]];
                 let dataGauge = google.visualization.arrayToDataTable([
                     ['Label', 'Value'],
                     ['All users', totalStudents]
