@@ -127,6 +127,16 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new ResourceNotFoundException("User with id [%s] was not found.".formatted(id)));
     }
 
+        @Override
+    public List<String> findTopScoredStudentsNames() {
+        return this.userRepository.findTopScoredStudentsNames();
+    }
+
+    @Override
+    public long getUsersCount() {
+        return this.userRepository.count();
+    }
+
     private User getByUsername(String name) {
         return this.userRepository.findByUsername(name)
                 .orElseThrow(() -> new ResourceNotFoundException("User with username [%s] was not found.".formatted(name)));
