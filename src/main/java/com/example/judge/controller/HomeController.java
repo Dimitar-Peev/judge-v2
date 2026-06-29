@@ -1,6 +1,7 @@
 package com.example.judge.controller;
 
-import jakarta.servlet.http.HttpSession;
+import com.example.judge.model.view.HomeViewModel;
+import com.example.judge.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -10,21 +11,22 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class HomeController {
 
-    private final HttpSession httpSession;
-
+    private final UserService userService;
 
     @GetMapping(value = {"/", "index"})
-    public String index(Model model) {
-
-        if (this.httpSession.getAttribute("loggedIn") != null) {
-            return "home";
-        }
+    public String index() {
 
         return "index";
     }
 
     @GetMapping("/home")
     public String home(Model model) {
+
+        HomeViewModel homeViewModel = new HomeViewModel();
+        homeViewModel.setTotalUsersCount(this.userService.getUsersCount());
+        homeViewModel.setStudents(this.userService.findTopScoredStudentsNames());
+
+        model.addAttribute("homeViewModel", homeViewModel);
 
         return "home";
     }
