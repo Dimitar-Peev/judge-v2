@@ -19,4 +19,8 @@ public interface UserService {
 
     UserServiceModel findById(String id);
 
+    List<String> findTopScoredStudentsNames();
+
+    long getUsersCount();
+
 }
