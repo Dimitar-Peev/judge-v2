@@ -22,11 +22,11 @@ public class ExerciseServiceImpl implements ExerciseService {
     @Override
     public ExerciseServiceModel add(ExerciseServiceModel exerciseServiceModel) {
 
-        Exercise exercise = modelMapper.map(exerciseServiceModel, Exercise.class);
+        Exercise exercise = this.modelMapper.map(exerciseServiceModel, Exercise.class);
         Exercise saved = this.exerciseRepository.save(exercise);
-        log.info("Successfully added exercise.");
+        log.info("Successfully added exercise with name [{}]", exercise.getName());
 
-        return modelMapper.map(saved, ExerciseServiceModel.class);
+        return this.modelMapper.map(saved, ExerciseServiceModel.class);
     }
 
     @Override
@@ -38,7 +38,6 @@ public class ExerciseServiceImpl implements ExerciseService {
     public ExerciseServiceModel findByName(String exercise) {
         return this.exerciseRepository.findByName(exercise)
                 .map(ex -> this.modelMapper.map(ex, ExerciseServiceModel.class))
-//                .orElseThrow(() -> new ResourceNotFoundException("Exercise not found"));
                 .orElse(null);
     }
 
