@@ -15,4 +15,6 @@ public class HomeViewModel {
 
     private List<String> students;
 
+    private List<String> activeExercises;
+
 }
