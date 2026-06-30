@@ -60,9 +60,9 @@
                             <h2 class="tm-block-title">Active Exercises</h2>
                             <ol class="tm-list-group">
 
-                                <li class="tm-list-group-item">Active exercise one</li>
-                                <li class="tm-list-group-item">Active exercise two</li>
-                                <li class="tm-list-group-item">Active exercise three</li>
+                                <li th:each="ex : ${homeViewModel.activeExercises}" th:text="${ex}" class="tm-list-group-item">
+                                    Active exercise
+                                </li>
 
                             </ol>
                         </div>
